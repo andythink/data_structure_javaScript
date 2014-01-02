@@ -1,0 +1,112 @@
+//约定规制：数组下标用index，数着第几个用num
+
+//线性表--顺序存储结构
+var lineTable = function(){
+		var MAXSIZE = 100
+		var A = new Array(MAXSIZE)
+		
+		return {
+			length: 0,
+			add: function(item){
+				if(this.length === MAXSIZE)
+					return false			
+				A[this.length] = item
+				this.length = this.length + 1
+				return item
+			},
+			get: function(index){
+				if(this.length === 0 || index < 0 || index >= this.length)
+					return false
+				return A[index]
+			},
+			remove: function(index){
+				if(this.length === 0 || index < 0 || index >= MAXSIZE || index >= this.length)
+					return false	
+				var temp = A[index]
+				for(var i=index; i<this.length; i++){
+					A[i] = A[i+1]
+				}
+				this.length--
+				return temp			
+			},
+			insert: function(item, index){
+				if(this.length === MAXSIZE || index < 0 || index > this.length)
+					return false	
+				for(var i=this.length-1; i>index; i--){
+					A[i+1] = A[i]
+				}
+				A[index] = item
+				return true			
+			},
+			toString: function(){
+				return '[' + A.slice(0, this.length).join(', ') + ']'
+			}
+
+
+		}
+
+	}()
+
+	//线性表--链式存储结构
+	function Node(item){
+		this.data = item
+		this.next = null
+	}
+	function LinkTable(){
+		this.length = 0
+		this.front = null
+		this.rear = null
+		this.add = function(item){
+			if(this.length === 0){
+				this.front = this.rear = new Node(item)
+				this.length++
+				return item
+			}else{
+				this.rear.next = new Node(item)
+				this.rear = this.rear.next
+				this.length++
+				return item
+			}
+			return false
+		}
+		this.locationByNum = function(num){
+			if(num <= 0 || num > this.length)
+				return null
+			var tempNode = this.front
+			for(var i=1; i<num; i++){
+				tempNode = tempNode.next
+			}
+			return tempNode
+
+		}
+		this.get = function(num){
+			var tempNode = this.locationByNum(num)
+			if(tempNode === null)
+				return false
+			else
+				return tempNode.data
+		}
+		this.insert = function(num, item){
+			var beforeNode = this.locationByNum(num-1)
+			if(beforeNode === null)
+				return false
+			var afterNode = beforeNode.next
+			beforeNode.next = new Node(item)
+			beforeNode.next.next = afterNode
+		}
+		this.toString = function(){
+			var resultArray = []
+			var tempNode = this.front
+			while(tempNode != null){
+				resultArray.push(tempNode.data)
+				tempNode = tempNode.next
+			}
+			return '[' + resultArray.join(', ') + ']'
+		}
+	}
+
+	var linkTable = new LinkTable()
+	linkTable.add(3)
+	linkTable.add(4)
+	linkTable.add(5)
+	linkTable.add(6)
