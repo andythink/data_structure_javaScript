@@ -1,0 +1,199 @@
+//插入排序
+//思路：将第i个元素插入前面已经排好的序列中
+//注意点：对遇到<=第i个元素，立刻break
+var testData = [49, 38, 65, 97, 76, 13, 27, 49]
+var length = testData.length
+function insertSort(){
+	for(var i=1; i<length; i++){
+		var temp = testData[i]
+		for(var j=i; j>0; j--){
+			if(testData[j-1] > temp){
+				testData[j] = testData[j-1]
+			}else{
+				break
+			}
+		}
+		testData[j] = temp
+	}
+	return testData
+}
+
+//选择排序
+//思路：从第i个元素后，选择一个最小与i元素交换
+function selectSort(){
+	for(var i=0; i<length-1; i++){
+		var temp = testData[i]
+		var selected = i
+		for(var j=i+1; j<length; j++){
+			if(testData[j] < testData[selected]){
+				selected = j
+			}
+		}
+		testData[i] = testData[selected]
+		testData[selected] = temp
+	}
+	return testData
+}
+
+//冒泡排序
+//思路：比较，交换，一趟以后最大的元素在下面
+//注意点：当一趟，没有元素交换，表示整个序列已经有序
+function bubbleSort(){
+	for(var i=length-1; i>=2 ; i--){
+		var flag = false
+		for(var j=0; j<i; j++){
+			if(testData[j] > testData[j+1]){
+				var temp = testData[j]
+				testData[j] = testData[j+1]
+				testData[j+1] = temp
+				flag = true
+			}
+		}
+		if(!flag)
+			break
+	}
+	return testData
+}
+
+//谢尔拍序
+//思路：用间隔数，分成多个子序列，然后缩小，直到间隔等于0
+//注意点：当间隔数 gap 所有子序列的第一个元素，都在0--（gap-1）之间，让后调用插入排序
+function shellSort(){	
+	var gap = length
+	while(gap > 1){
+		gap = Math.floor(gap / 2)
+		for(var i=0; i<gap; i++){
+			insertSort(testData, i, length, gap)
+		}
+	}
+
+	function insertSort(array, first, length, gap){
+		for(var i=first+gap; i<length; i=i+gap){
+			var temp = array[i]
+			for(var j=i; j>=0; j=j-gap){
+				if(temp < array[j-gap]){
+					array[j] = array[j-gap]
+				}else{
+					break
+				}
+			}
+			array[j] = temp
+		}
+	}
+	return testData
+}
+
+//快速排序，又称划分排序
+//思路：选择一个分界元素，进行一次划分，小于分界的放到前面，大于的放到后面
+function quickSort(boundaryIndex, startIndex, endIndex, array){
+	if(startIndex >= endIndex)
+		return
+	var temp = 0,
+		i = startIndex,
+		j = endIndex
+
+	while(i < j){
+		toRight()
+		toLeft()
+		if(i < j){
+			temp = array[i]
+			array[i] = array[j]
+			array[j] = temp
+			i = i + 1
+			j = j - 1
+		}	
+	}
+	if(array[j] >= array[boundaryIndex]){
+		j--
+	}
+	temp = array[j]
+	array[j] = array[boundaryIndex]
+	array[boundaryIndex] = temp
+
+	quickSort(startIndex, startIndex, j-1, array)
+	quickSort(j+1, j+1, endIndex, array)
+
+	function toRight(){
+		while(i < endIndex){
+			if(array[i] <= array[boundaryIndex]){
+				i++
+			}else{
+				break
+			}
+		}
+	}
+	function toLeft(){
+		while(j > startIndex && j > i){
+			if(array[j] >= array[boundaryIndex]){
+				j--
+			}else{
+				break
+			}
+		}
+	}
+}
+
+//二路归并排序
+//思路：n个数，趟数=log2(n)-->切分--->归并
+function mergeSort(A, B, length){
+	var totalPass = Math.ceil(Math.log(length) / Math.log(2))
+	//循环趟数
+	for(var numPass=1, flag=true; numPass<=totalPass; numPass++){
+		if(flag){
+			pass(numPass, A, B, length)
+			flag = false
+		}else{
+			pass(numPass, B, A, length)
+			flag = true
+		}
+			
+	}
+
+	//分割数组的关键点：1.已经有几个有序元素个数
+	//					2.剩下的元素个数
+	function pass(num, C, D, length){
+		var hasOrder = Math.pow(2, num-1),
+			i = 0,
+			nextStart,
+			startIndex,
+			middleIndex,
+			endIndex
+		for(nextStart=i; nextStart <length; nextStart=2*hasOrder*(++i)){
+			if((length - nextStart) <= hasOrder){
+				while(nextStart < length){
+					D[nextStart] = C[nextStart]
+					nextStart++
+				}
+				break
+			}
+			middleIndex = nextStart + hasOrder-1
+			endIndex = nextStart + 2*hasOrder-1
+			if((length - nextStart) < 2*hasOrder){
+				endIndex = length - 1
+			}
+			merge(C, D, nextStart, middleIndex, endIndex)
+
+		}
+	}
+
+	function merge(C, D, startIndex, middleIndex, endIndex){
+		var i = startIndex,
+			j = middleIndex + 1,
+			k = i
+		while(i <= middleIndex && j<= endIndex){
+			if(C[i] <= C[j]){
+				D[k++] = C[i++]
+			}else{
+				D[k++] = C[j++]
+			}
+		}
+		while(i <= middleIndex){
+			D[k++] = C[i++]
+		}
+		while(j <= endIndex){
+			D[k++] = C[j++]
+		}
+	}
+}
+var A = testData
+var B = []
